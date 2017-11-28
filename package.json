@@ -1,0 +1,30 @@
+{
+  "name": "picogw-plugin-web",
+  "version": "0.0.1",
+  "description": "Web plugin of picogw",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KAIT-HEMS/node-picogw-plugin-web.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KAIT-HEMS/node-picogw-plugin-web/issues"
+  },
+  "homepage": "https://github.com/KAIT-HEMS/node-picogw-plugin-web#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "mime": "^2.0.3",
+    "websocket": "^1.0.25"
+  },
+  "picogw": {
+    "role": [
+      "client"
+    ]
+  }
+}
