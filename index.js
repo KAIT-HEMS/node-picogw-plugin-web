@@ -32,7 +32,7 @@ exports.init = function(pluginInterface){
 		}) ;
 
 		// REST API call
-		http.all(`/v.+/*`, function(req, res, next){
+		http.all(`/v*/*`, function(req, res, next){
 			// for( var e in req ){if( typeof req[e] == 'string') log(e+':'+req[e]);}
 			// var caller_ip = req.ip ;
 			var args = req.body ;
@@ -59,8 +59,12 @@ exports.init = function(pluginInterface){
 				}
 			}
 			pi.client.callProc({method:req.method,path:req.path,args:args})
-				.then( re=>{res.jsonp(re);} ).catch( re=>{res.jsonp(re);} /*console.error*/ ) ;
-
+				.then(re=>{
+                    res.jsonp(re);
+                }).catch(e=>{
+                    next();
+                    /*console.error*/
+                });
 		}) ;
 
 		// Static contents call
