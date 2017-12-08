@@ -64,7 +64,7 @@ The external libraries used and their licenses are listed in <a href='https://gi
 <script src='js/picogw.js'></script>
 <script>
 
-const API_ROOT_PREFICES = {'v1':{option:{leaf:false}},'v2':{option:{leaf:false}}} ;
+const API_ROOT_PREFICES = {'v1':{option:{leaf:false}}} ;
 var log = console.log ;
 var res_tree = $('#resource_tree') ;
 var node_properties = {'.':{isleaf:false, settings_schema:undefined, settings:undefined /*,longdoc:undefined*/}} ;
@@ -468,19 +468,5 @@ function genAppsList(){
 	});
 }
 
-</script>
-<script>
-// Non-GET method test.
-	/*$.ajax({
-		type: 'DELETE'
-		,url: '/v2/Temperature/Living'
-		,data: {expected:22}
-		,success: content=>{
-			console.log(content) ;
-			//alert(JSON.stringify(content,null,'\t')) ;
-		}
-		,error: err=>{ alert(JSON.stringify(err,null,'\t')) ; }
-	});
-	*/
 </script>
 </html>

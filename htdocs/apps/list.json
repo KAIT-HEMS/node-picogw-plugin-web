@@ -53,14 +53,4 @@
 		]
 		,"url": "/apps/remote_controllers/ECHONET_Buzzer.html"
 	}
-	,{
-		"title":"Node-RED"
-		,"description":"Node-RED GUI. To use this, hit \"npm run v2api\" in PicoGW root and reboot."
-		,"icon":"/apps/node-red/icon.png"
-		,"required_paths":[
-			"*"
-		]
-		,"url": "http://%%_PICOGW_HOSTNAME_%%:1880"
-		,"eula": "Before using this app, you have to execute\\n\\n$ npm run v2api\\n\\n at PicoGW root and reboot."
-	}
 ]
