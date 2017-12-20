@@ -4,6 +4,7 @@
   "description": "Web plugin of picogw",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,5 +27,9 @@
     "role": [
       "client"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^4.13.1",
+    "eslint-config-google": "^0.9.1"
   }
 }
