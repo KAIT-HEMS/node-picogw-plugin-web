@@ -18,10 +18,7 @@
   },
   "homepage": "https://github.com/KAIT-HEMS/node-picogw-plugin-web#readme",
   "dependencies": {
-    "body-parser": "^1.18.2",
-    "express": "^4.16.2",
-    "mime": "^2.0.3",
-    "websocket": "^1.0.25"
+    "mime": "^2.0.3"
   },
   "picogw": {
     "role": [
