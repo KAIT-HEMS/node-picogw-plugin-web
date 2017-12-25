@@ -22,7 +22,7 @@
   },
   "picogw": {
     "role": [
-      "client"
+      "client", "http"
     ]
   },
   "devDependencies": {
