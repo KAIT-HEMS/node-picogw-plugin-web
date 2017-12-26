@@ -2,7 +2,15 @@ let mime = require('mime');
 let fs = require('fs');
 let pathm = require('path');
 
-exports.init = function(pluginInterface) {
+module.exports = {
+    init: init,
+};
+
+/**
+ * Initialize plugin
+ * @param {object} pluginInterface The interface of picogw plugin
+ */
+function init(pluginInterface) {
     const pi = pluginInterface;
     const log = pi.log;
 
