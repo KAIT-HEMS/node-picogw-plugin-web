@@ -14,50 +14,6 @@ function init(pluginInterface) {
     const pi = pluginInterface;
     const log = pi.log;
 
-    // REST API call
-    pi.http.endpoint('all', `/v*/*`, function(req, res, next) {
-        // for( var e in req ){if( typeof req[e] == 'string') log(e+':'+req[e]);}
-        // var caller_ip = req.ip ;
-        let args = req.body;
-        // Overwrite args in body with GET parameters
-        if (req.originalUrl.indexOf('?') >= 0) {
-            const pos = req.originalUrl.indexOf('?')+1;
-            req.originalUrl.slice(pos).split('&').forEach((eq)=>{
-                let terms = eq.split('=');
-                if (terms[0] === 'callback' ||
-                    terms[0] === 'jsoncallback') {
-                    return;
-                }
-                if (terms.length === 1) {
-                    args.value = decodeURIComponent(terms[0]);
-                } else {
-                    args[terms[0]] = decodeURIComponent(terms[1]);
-                }
-            });
-        }
-
-        // 多分常に文字列。JSONオブジェクトに変換できるときはオブジェクトに、数値に変換できる
-        // 時は数値に、それ以外はそのまま文字列として、プラグインに与える。
-        for (let k in args) {
-            if (typeof args[k] == 'string') {
-                try {
-                    args[k] = JSON.parse(args[k]);
-                } catch (e) {
-                    if (isFinite(parseInt(args[k]))) {
-                        args[k] = parseInt(args[k]);
-                    }
-                }
-            }
-        }
-        pi.client.callProc({method: req.method, path: req.path, args: args})
-            .then((re)=>{
-                res.jsonp(re);
-            }).catch((e)=>{
-                next();
-                /* console.error*/
-            });
-    });
-
     // Static contents call
     pi.http.endpoint('get', '*', (req, res, next) => {
         let path = req.path;
