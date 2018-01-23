@@ -41,7 +41,7 @@ function init(pluginInterface) {
     let subscribeFuncs = {};
     pi.http.onMessage(function(connection, message) {
         if (message.type === 'utf8') {
-            log('Received Message: ' + message.utf8Data);
+            //log('Received Message: ' + message.utf8Data);
             let req;
             try {
                 req = JSON.parse(message.utf8Data);
