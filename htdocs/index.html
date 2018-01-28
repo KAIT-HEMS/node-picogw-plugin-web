@@ -67,7 +67,7 @@ The external libraries used and their licenses are listed in <a href='https://gi
 const API_ROOT_PREFICES = {'v1':{option:{leaf:false}}} ;
 var log = console.log ;
 var res_tree = $('#resource_tree') ;
-var node_properties = {'.':{isleaf:false, settings_schema:undefined, settings:undefined /*,longdoc:undefined*/}} ;
+var node_properties = {'.':{isleaf:false, settings_schema:undefined, settings:undefined}} ;
 
 let picogw ;
 
@@ -95,10 +95,17 @@ onload = function(){
 				} else {// Not open yet
 					var selnodename = data.selected[0] ;
 					if( node_properties[selnodename].isleaf ){
-						if( node_properties[selnodename].longdoc != undefined )
-							alert(node_properties[selnodename].longdoc) ;
-						else
-							alert('No documentation available on this leaf.') ;
+						// Access API!
+						const path_real = data.node.id.replace(new RegExp('\\.','g'),'/') ;
+						picogw.callproc({
+							method:'GET'
+							,path:path_real
+							,args:{option:'true'}
+						}).then(function(json){
+							alert('API call for '+path_real+':\n'+JSON.stringify(json,null,'\t')) ;
+						}).catch(e=>{
+							alert('API call failed:'+path_real) ;
+						}) ;
 					} else {
 						t_open(selnodename) ;
 					}
@@ -193,13 +200,6 @@ onload = function(){
 		        			}) ;
 	        			}} ;
 	        		}
-
-		        	/*menu.Document = {label:'Document', action:obj=>{
-							if( node_properties[node.id].longdoc != undefined )
-								alert(node_properties[node.id].longdoc) ;
-							else
-								alert('No document available.') ;
-						}} ;*/
 
 					menu.TestAPI = {label:'Test API',action:obj=>{
 						let node_prop = node_properties[node.id] ;
@@ -345,7 +345,7 @@ function t_open(path){
 				let next_path_id = path+dk+'.' ;
 				let txt = dk;//`${path_real}${dk}` ;
 
-				node_properties[next_path_id] = {isleaf:true, settings_schema:undefined, settings:undefined /*,longdoc:undefined*/} ;
+				node_properties[next_path_id] = {isleaf:true, settings_schema:undefined, settings:undefined } ;
 
 				let longdoc ;
 				try {
@@ -355,8 +355,6 @@ function t_open(path){
 						if( opt.doc.short != undefined )
 							txt += ' (' + opt.doc.short +')' ;
 						longdoc = opt.doc.long ;
-						/*if( longdoc != undefined)
-							node_properties[next_path_id].longdoc = longdoc ;*/
 					}
 					if( node_properties[next_path_id].settings_schema = opt.settings_schema )
 						txt += '<span class="ui-icon ui-icon-gear" style="display:inline-block"></span>';
