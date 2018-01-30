@@ -100,7 +100,6 @@ onload = function(){
 						picogw.callproc({
 							method:'GET'
 							,path:path_real
-							,args:{option:'true'}
 						}).then(function(json){
 							alert('API call for '+path_real+':\n'+JSON.stringify(json,null,'\t')) ;
 						}).catch(e=>{
