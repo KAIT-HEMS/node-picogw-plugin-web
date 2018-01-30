@@ -12,7 +12,6 @@ module.exports = {
  */
 function init(pluginInterface) {
     const pi = pluginInterface;
-    const log = pi.log;
 
     // Static contents call
     pi.http.endpoint('get', '*', (req, res, next) => {
@@ -36,58 +35,5 @@ function init(pluginInterface) {
 
             res.send(data);
         });
-    });
-
-    let subscribeFuncs = {};
-    pi.http.onMessage(function(connection, message) {
-        if (message.type === 'utf8') {
-            //log('Received Message: ' + message.utf8Data);
-            let req;
-            try {
-                req = JSON.parse(message.utf8Data);
-                if (req.method.toUpperCase() == 'SUB') {
-                    let cbfunc = function(re) {
-                        connection.sendUTF(JSON.stringify(re));
-                    };
-                    if (subscribeFuncs[req.path] == undefined) {
-                        pi.client.subscribe(req.path, cbfunc);
-                        subscribeFuncs[req.path] = cbfunc;
-                    }
-                    connection.sendUTF(JSON.stringify(
-                        {success: true, tid: req.tid}));
-                } else if (req.method.toUpperCase() == 'UNSUB') {
-                    if (subscribeFuncs[req.path] != undefined) {
-                        pi.client.unsubscribe(
-                            req.path, subscribeFuncs[req.path]);
-                        delete subscribeFuncs[req.path];
-                    }
-                    connection.sendUTF(JSON.stringify(
-                        {success: true, tid: req.tid}));
-                } else {
-                    pi.client.callProc(req).then((re)=>{
-                        re.tid = req.tid;
-                        connection.sendUTF(JSON.stringify(re)+'\n');
-                    }).catch((e)=>{
-                        e.tid = req.tid;
-                        connection.sendUTF(JSON.stringify(e)+'\n');
-                    });
-                }
-            } catch (e) {
-                log('Error in receiving websocket message');
-                log(JSON.stringify(e));
-                log(e);
-            }
-        } else if (message.type === 'binary') {
-            log('Received Binary Message of ' + message.binaryData.length + ' bytes. Ignore.'); // eslint-disable-line max-len
-            // connection.sendBytes(message.binaryData);
-        }
-    });
-
-    pi.http.onClose(function(reasonCode, description) {
-        // log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
-        for (const path of Object.keys(subscribeFuncs)) {
-            pi.client.unsubscribe(path, subscribeFuncs[path]);
-        }
-        subscribeFuncs = {};
     });
 };
