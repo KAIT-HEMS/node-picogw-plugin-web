@@ -14,11 +14,11 @@ A device API server that hosts <a href='http://www.daiwahouse.co.jp/lab/HousingA
 </span>
 <br clear='all'>
 <div id="tabs">
-  <ul>
-    <li><a href="#tabs-resources">API Hierarchy</a></li>
-    <li><a href="#tabs-apps">Apps</a></li>
-    <li><a href="#tabs-howto">Howto</a></li>
-    <li><a href="#tabs-about">About</a></li>
+  <ul id='tabs_index'>
+    <li id='tabs_index_resources'><a href="#tabs-resources">API Hierarchy</a></li>
+    <li id='tabs_index_apps'><a href="#tabs-apps">Apps</a></li>
+    <li id='tabs_index_howto'><a href="#tabs-howto">Howto</a></li>
+    <li id='tabs_index_about'><a href="#tabs-about">About</a></li>
   </ul>
 
 
@@ -31,17 +31,19 @@ A device API server that hosts <a href='http://www.daiwahouse.co.jp/lab/HousingA
 <div id='tabs-howto'>
 To access ECHONET Lite device, right click the device's property name (such as OperatingState) and select 'Open API', which generates ECHONET Lite's GET access to the property in new tab.
 <div id='api_howto'>
- The detailed description is on <a href="https://github.com/KAIT-HEMS/PicoGW/blob/master/README.md" target="_blank">GitHub README.</a>.
+ The detailed description is on <a href="https://github.com/KAIT-HEMS/node-picogw/blob/master/README.md" target="_blank">GitHub README.</a>.
 </div>
 </div>
 
 <div id='tabs-about'>
 This software is originally developed by Shigeru Owada@Kanagawa Instutite of Technology.<br />
-This is distributed from <a href='https://github.com/KAIT-HEMS/PicoGW' target="_blank">GitHub</a> by MIT license.
+This is distributed from <a href='https://github.com/KAIT-HEMS/node-picogw' target="_blank">GitHub</a> by MIT license.
 
 <div id='license_text'>
-The external libraries used and their licenses are listed in <a href='https://github.com/KAIT-HEMS/PicoGW/blob/master/README.md' target='_blank'>GitHub README</a>.
+The external libraries used and their licenses are listed in <a href='https://github.com/KAIT-HEMS/node-picogw/blob/master/README.md' target='_blank'>GitHub README</a>.
 </div>
+</div>
+
 </div>
 
 <div id="api-test-dialog" title="API Test">
@@ -62,6 +64,7 @@ The external libraries used and their licenses are listed in <a href='https://gi
 <script src='js/marked.min.js'></script>
 <script src='js/cryptico.min.js'></script>
 <script src='js/picogw.js'></script>
+<script src='js/customize.js'></script><!-- this file does not exist by default -->
 <script>
 
 const API_ROOT_PREFICES = {'v1':{option:{leaf:false}}} ;
@@ -72,12 +75,10 @@ var node_properties = {'.':{isleaf:false, settings_schema:undefined, settings:un
 let picogw ;
 
 const RSA_PUB_KEY = __%%RSA_PUB_KEY%%__ ;
-const ADDITIONAL_LICENSES_LINK = __%%ADDITIONAL_LICENSES%%__ ;
-
-
 
 let bInitialized = false ;
 onload = function(){
+
 	connectws(_picogw=>{
 		picogw = _picogw ;
 		if( bInitialized ) return ;
@@ -293,6 +294,7 @@ onload = function(){
 	    }) ;
 	}) ;
 
+	if( typeof customize == 'function' ) customize();
 
 	// Create tabs
 	$( "#tabs" ).tabs();	// Stylize by jquery ui
@@ -300,16 +302,17 @@ onload = function(){
 	// Load README document from GitHub
 	$.ajax({
 		type: 'GET'
-		,url: 'https://raw.githubusercontent.com/KAIT-HEMS/PicoGW/master/README.md'
+		,url: 'https://raw.githubusercontent.com/KAIT-HEMS/node-picogw/master/README.md'
 		,success: content=>{
 			const START_POINT = content.indexOf('## Remarks') ;
 			const LICENSE_POINT = content.indexOf('## Licenses') ;
 			var apihowto = content.slice( START_POINT , LICENSE_POINT) ;
 			var license = content.slice( LICENSE_POINT ) ;
-			apihowto=apihowto.split('![](res/').join('![](https://raw.githubusercontent.com/KAIT-HEMS/PicoGW/master/res/') ;
-			license=license.split('![](res/').join('![](https://raw.githubusercontent.com/KAIT-HEMS/PicoGW/master/res/') ;
+			apihowto=apihowto.split('![](res/').join('![](https://raw.githubusercontent.com/KAIT-HEMS/node-picogw/master/res/') ;
+			license=license.split('![](res/').join('![](https://raw.githubusercontent.com/KAIT-HEMS/node-picogw/master/res/') ;
 
-			license += ADDITIONAL_LICENSES_LINK ;
+			if( typeof getAdditionalLicensesInMarkDown == 'function' )
+			license += getAdditionalLicensesInMarkDown() ;
 
 			$('#api_howto').html(marked(apihowto)) ;
 			$('#license_text').html(marked(license)) ;
