@@ -24,11 +24,10 @@ function init(pluginInterface) {
                 res.status(404).send('No such resource');
                 return;
             }
-            if (path==='/index.html') {
+            if (path==='/js/customize.js') {
                 data = data.toString();
                 data = data.split('__%%RSA_PUB_KEY%%__')
                     .join('"'+pi.crypt.getPubKey()+'"');
-                data = data.split('__%%ADDITIONAL_LICENSES%%__').join('""');
             }
             res.set('Content-Type', mime.getType(path)); // 'text/html; charset=UTF-8'
             res.status(200);

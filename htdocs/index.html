@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="js/jstree-themes/default/style.min.css" />
+  <link rel="stylesheet" href="js/jstree-themes/default/style.min.css" />
+  <title>PicoGW</title>
 <style>
   .app-button { height:140px;width:100px;margin:5px;padding:0px;}
   .app-icon { margin-top:0px;padding:0px; }
@@ -64,7 +65,7 @@ The external libraries used and their licenses are listed in <a href='https://gi
 <script src='js/marked.min.js'></script>
 <script src='js/cryptico.min.js'></script>
 <script src='js/picogw.js'></script>
-<script src='js/customize.js'></script><!-- this file does not exist by default -->
+<script src='js/customize.js'></script>
 <script>
 
 const API_ROOT_PREFICES = {'v1':{option:{leaf:false}}} ;
@@ -73,8 +74,6 @@ var res_tree = $('#resource_tree') ;
 var node_properties = {'.':{isleaf:false, settings_schema:undefined, settings:undefined}} ;
 
 let picogw ;
-
-const RSA_PUB_KEY = __%%RSA_PUB_KEY%%__ ;
 
 let bInitialized = false ;
 onload = function(){
@@ -182,7 +181,7 @@ onload = function(){
 											picogw.callproc({
 												method:'POST'
 												,path: path+'settings'
-												,args:{encrypted:cryptico.encrypt( JSON.stringify(editor.getValue()), RSA_PUB_KEY ).cipher}
+												,args:{encrypted:cryptico.encrypt( JSON.stringify(editor.getValue()), getPubKey() ).cipher}
 											}).then(function(json){
 												console.log(json) ;
 												if( json.error == undefined ) alert('New settings saved.'); else alert(json.error);
