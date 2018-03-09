@@ -117,7 +117,7 @@ onload = function(){
 			res_tree.jstree( 'delete_node', data.node.children) ;
 		}) ;
 		// Open root elements for first time
-		res_tree.on('loaded.jstree',(e,data)=>{ t_open('.'); }) ;
+		res_tree.on('loaded.jstree',(e,data)=>{ t_open('.');t_open('.v1.'); }) ;
 		// Initialize
 		res_tree.jstree({
 			core: {
