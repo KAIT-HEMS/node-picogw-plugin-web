@@ -285,21 +285,23 @@ onload = function(){
 					if( node.id.length > '.v1.'.length ){
 						menu.Delete = {label:'Send DELETE to node',action:obj=>{
 							let path_real = node.id.split('.').join('/');
-							picogw.callproc({
-								method:'DELETE'
-								,path: path_real
-							}).then(function(json){
-								const parent_path = node.id.split('.').slice(0,-2).join('.')+'.' ;
-								res_tree.jstree('close_node', parent_path);
+							if( confirm(`Are you sure you want to delete ${path_real}?`) ){
+								picogw.callproc({
+									method:'DELETE'
+									,path: path_real
+								}).then(function(json){
+									const parent_path = node.id.split('.').slice(0,-2).join('.')+'.' ;
+									res_tree.jstree('close_node', parent_path);
 
-								if( json.errors == undefined ) alert(json.message);
-								else                           alert(json.errors);
+									if( json.errors == undefined ) alert(json.message);
+									else                           alert(json.errors);
 
-								t_open( parent_path );
-							}).catch(e=>{
-								alert('API call failed:'+path) ; 
-								console.error(e) ;
-							});
+									t_open( parent_path );
+								}).catch(e=>{
+									alert('API call failed:'+path) ; 
+									console.error(e) ;
+								});
+							};
 						}};
 					};
 	        		return menu ;
