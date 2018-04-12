@@ -68,7 +68,7 @@ The external libraries used and their licenses are listed in <a href='https://gi
 <script src='js/customize.js'></script>
 <script>
 
-const API_ROOT_PREFICES = {'v1':{option:{leaf:false}}} ;
+const API_ROOT_PREFICES = {'v1':{_info:{leaf:false}}} ;
 var log = console.log ;
 var res_tree = $('#resource_tree') ;
 var node_properties = {'.':{isleaf:false, settings_schema:undefined, settings:undefined}} ;
@@ -142,13 +142,13 @@ onload = function(){
 								picogw.callproc({
 									method:'GET'
 									,path: node.id.split('.').slice(0,-2).join('/')
-									,args:{option:'true'}
+									,args:{info:'true'}
 								}).then(function(json){
 
 			        			// Reload schema and current value
 		    					var new_node_prop = json[node.id.split('.').slice(-2,-1)[0]] ;
-		    					node_properties[node.id].settings_schema = new_node_prop.option.settings_schema ;
-		    					node_properties[node.id].settings = new_node_prop.option.settings ;
+		    					node_properties[node.id].settings_schema = new_node_prop._info.settings_schema ;
+		    					node_properties[node.id].settings = new_node_prop._info.settings ;
 
 
 		        				var settings_schema = node_properties[node.id].settings_schema ;
@@ -254,13 +254,13 @@ onload = function(){
 							picogw.callproc({
 								method:'GET'
 								,path:path_real
-								,args:{option:'true'}
+								,args:{info:'true'}
 							}).then(function(json){
 								for( let k in json ){
 									let path = path_real+k ;
 									access_queue.push({method:'GET',path:path});
-									if( json[k].option == null ) continue ;
-									let test = json[k].option.test ;
+									if( json[k]._info == null ) continue ;
+									let test = json[k]._info.test ;
 									if( test instanceof Array ){
 										test.forEach(te=>{
 											te.path = path ;
@@ -358,13 +358,14 @@ function t_open(path){
 		picogw.callproc({
 			method:'GET'
 			,path: path_real
-			,args:{option:'true'}
+			,args:{info:'true'}
 		}).then(function(json){
 			if( path_real == '/' )
 				json = API_ROOT_PREFICES ;
 
 			let id_to_longdoc = {} ;
 			for( let dk in json ){
+				if( dk.charAt(0)=='_' ) continue;
 				let next_path_id = path+dk+'.' ;
 				let txt = dk;//`${path_real}${dk}` ;
 
@@ -372,7 +373,7 @@ function t_open(path){
 
 				let longdoc ;
 				try {
-					let opt = json[dk].option ;
+					let opt = json[dk]._info ;
 					node_properties[next_path_id].isleaf = (opt.leaf !== false) ;
 					if( opt.doc != undefined ){
 						if( opt.doc.short != undefined )
