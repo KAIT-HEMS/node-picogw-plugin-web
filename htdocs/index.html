@@ -257,6 +257,7 @@ onload = function(){
 								,args:{info:'true'}
 							}).then(function(json){
 								for( let k in json ){
+									if( k.charAt(0)=='_') continue ;
 									let path = path_real+k ;
 									access_queue.push({method:'GET',path:path});
 									if( json[k]._info == null ) continue ;
