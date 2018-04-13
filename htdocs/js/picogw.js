@@ -12,7 +12,7 @@ Initialize:
 CallProc:
 	picogw.callproc({
 		method: "PUT"
-		,path: "/v1/echonet/GenericIllumination_2/OperatingState/"
+		,path: "/v1/echonet/genericillumination_1/operatingstate/"
 		,args: {value:'off'}
 	}).then(re=>{
 		console.log('Return:') ;
@@ -21,19 +21,19 @@ CallProc:
 
 Subscribe:
 	picogw.sub({
-		path:'/v1/echonet/GenericIllumination_1/OperatingState/',
+		path:'/v1/echonet/genericillumination_1/operatingstate/',
 		callback:re=>{console.log('Published!');console.log(re);}
 	}) ;
 
 Unsubscribe:
 	// Unsub all handlers related to the path
 	picogw.unsub({
-		path:'/v1/echonet/GenericIllumination_1/OperatingState/')
+		path:'/v1/echonet/genericillumination_1/operatingstate/')
 	}) ;
 
 	// Unsub only one handler
 	picogw.unsub({
-		path:'/v1/echonet/GenericIllumination_1/OperatingState/'),
+		path:'/v1/echonet/genericillumination_1/operatingstate/'),
 		callback:func
 	}) ;
 */
@@ -82,45 +82,73 @@ function connectws(arg1, arg2, arg3) {
                     path = path.path;
                 }
                 if (path.slice(-1) == '/') path = path.slice(0, -1);
-                if (sublist[path] == undefined) {
-                    sublist[path]={
+                const path_low = path.toLowerCase();
+                if (sublist[path_low] == undefined) {
+                    sublist[path_low]={
                         single_callback: function(re) {
-                            this.callbacks.forEach((cb)=>{
-                                cb(re);
-                            });
+                            if (re[path_low] != null) {
+                            }
+                            if (re[path_low] == null) {
+                                this.callbacks.forEach((so)=>{
+                                    so.callback(re);
+                                });
+                            } else {
+                                const payload = re[path_low];
+                                delete re[path_low];
+                                this.callbacks.forEach((so)=>{
+                                    re[so.origpath] = payload;
+                                    so.callback(re);
+                                    delete re[so.origpath];
+                                });
+                            }
                         },
 						 callbacks: [],
                     };
-                    connection.send(JSON.stringify({method: 'SUB', path: path, tid: 4649}));
+                    connection.send(JSON.stringify({method: 'SUB', path: path_low, tid: 4649}));
                 }
-                if (sublist[path].callbacks.indexOf(callback)<0) {
-                    sublist[path].callbacks.push(callback);
-                }
+                sublist[path_low].callbacks.push({origpath: path, callback: callback});
             },
-            unsub: (_path, callback) => {
-                if (typeof _path == 'object') {
-                    callback = _path.callback;
-                    _path = _path.path;
+            unsub: (path, callback) => {
+                if (typeof path == 'object') {
+                    callback = path.callback;
+                    path = path.path;
+                } else if (typeof path == 'function') {
+                    callback = path;
+                    path = null;
                 }
-                function unsubmain(path) {
+
+                if (path != null) {
                     if (path.slice(-1) == '/') path = path.slice(0, -1);
-                    if (sublist[path]==undefined) return;
-                    if (callback != undefined) {
-                        let pos = sublist[path].callbacks.indexOf(callback);
-                        if (pos >= 0) {
-                            sublist[path].callbacks.splice(pos, 1);
+                    const path_low = path.toLowerCase();
+                    if (sublist[path_low]==undefined) return;
+
+                    sublist[path_low].callbacks =
+                        sublist[path_low].callbacks.filter((so)=>{
+                            return !(so.origpath == path
+                                     && (callback==null || so.callback == callback));
+                        });
+
+                    if (sublist[path_low].callbacks.length == 0) {
+                        connection.send(JSON.stringify({method: 'UNSUB', path: path_low}));
+                        delete sublist[path_low];
+                    }
+                } else if (callback != null) {
+                    for (path_low in sublist) {
+                        sublist[path_low].callbacks =
+                            sublist[path_low].callbacks.filter((so)=>{
+                                return so.callback != callback;
+                            });
+
+                        if (sublist[path_low].callbacks.length == 0) {
+                            connection.send(JSON.stringify({method: 'UNSUB', path: path_low}));
+                            delete sublist[path_low];
                         }
                     }
-                    if (callback == undefined || sublist[path].callbacks.length == 0) {
-                        connection.send(JSON.stringify({method: 'UNSUB', path: path}));
-                        delete sublist[path];
+                } else {
+                    for (path_low in sublist) {
+                        connection.send(JSON.stringify({method: 'UNSUB', path: path_low}));
                     }
-                }
-                if (_path != null) unsubmain(_path);
-                else {
-                    for (_path in sublist) {
-                        unsubmain(_path);
-                    }
+                    sublist = {};
                 }
             },
         };
