@@ -68,10 +68,11 @@ The external libraries used and their licenses are listed in <a href='https://gi
 <script src='js/customize.js'></script>
 <script>
 
-const API_ROOT_PREFICES = {'v1':{_info:{leaf:false}}} ;
+  const API_ROOT_PREFICES = {'v1':{_info:{leaf:false}}} ;
+  const SEP = '?';
 var log = console.log ;
 var res_tree = $('#resource_tree') ;
-var node_properties = {'.':{isleaf:false, settings_schema:undefined, settings:undefined}} ;
+var node_properties = {SEP:{isleaf:false, settings_schema:undefined, settings:undefined}} ;
 
 let picogw ;
 
@@ -90,13 +91,13 @@ onload = function(){
 			if( data.action == 'select_node' ) {
 				if( res_tree.jstree( 'is_open' , data.node ) ){
 					// Already open
-					if( data.node.id != '.')
+					if( data.node.id != SEP)
 						res_tree.jstree( 'close_node', data.node);
 				} else {// Not open yet
 					var selnodename = data.selected[0] ;
 					if( node_properties[selnodename].isleaf ){
 						// Access API!
-						const path_real = data.node.id.replace(new RegExp('\\.','g'),'/') ;
+						const path_real = data.node.id.replace(new RegExp('\\'+SEP,'g'),'/') ;
 						picogw.callproc({
 							method:'GET'
 							,path:path_real
@@ -117,11 +118,11 @@ onload = function(){
 			res_tree.jstree( 'delete_node', data.node.children) ;
 		}) ;
 		// Open root elements for first time
-		res_tree.on('loaded.jstree',(e,data)=>{ t_open('.');t_open('.v1.'); }) ;
+		res_tree.on('loaded.jstree',(e,data)=>{ t_open(SEP);t_open(`${SEP}v1${SEP}`); }) ;
 		// Initialize
 		res_tree.jstree({
 			core: {
-				'data': [{id:'.',text:'/'}]
+				'data': [{id:SEP,text:'/'}]
 				,'check_callback': true
 	        }
 	        ,plugins : [ 'contextmenu' , 'types']
@@ -141,12 +142,12 @@ onload = function(){
 								}
 								picogw.callproc({
 									method:'GET'
-									,path: node.id.split('.').slice(0,-2).join('/')
+									,path: node.id.split(SEP).slice(0,-2).join('/')
 									,args:{info:'true'}
 								}).then(function(json){
 
 			        			// Reload schema and current value
-		    					var new_node_prop = json[node.id.split('.').slice(-2,-1)[0]] ;
+		    					var new_node_prop = json[node.id.split(SEP).slice(-2,-1)[0]] ;
 		    					node_properties[node.id].settings_schema = new_node_prop._info.settings_schema ;
 		    					node_properties[node.id].settings = new_node_prop._info.settings ;
 
@@ -176,7 +177,7 @@ onload = function(){
 									, close : cleanup
 									, buttons: {
 										Apply: function(){
-											var path = node.id.split('.').join('/') ;
+											var path = node.id.split(SEP).join('/') ;
 
 											picogw.callproc({
 												method:'POST'
@@ -202,7 +203,7 @@ onload = function(){
 
 					menu.TestAPI = {label:'Test API',action:obj=>{
 						let node_prop = node_properties[node.id] ;
-						let path_real = node.id.replace(new RegExp('\\.','g'),'/') ;
+						let path_real = node.id.replace(new RegExp('\\'+SEP,'g'),'/') ;
 
 						let ht = '<pre>' ;
 						let access_queue = [] ;
@@ -279,19 +280,19 @@ onload = function(){
 					}} ;
 
 					menu.OpenAPI = {label:'Open API in other tab',action:obj=>{
-						var path_real = node.id.replace(new RegExp('\\.','g'),'/') ;
+						var path_real = node.id.replace(new RegExp('\\'+SEP,'g'),'/') ;
 						window.open( path_real,'_blank') ;
 					}} ;
 
-					if( node.id.length > '.v1.'.length ){
+					if( node.id.length > `${SEP}v1${SEP}`.length ){
 						menu.Delete = {label:'Send DELETE to node',action:obj=>{
-							let path_real = node.id.split('.').join('/');
+							let path_real = node.id.split(SEP).join('/');
 							if( confirm(`Are you sure you want to delete ${path_real}?`) ){
 								picogw.callproc({
 									method:'DELETE'
 									,path: path_real
 								}).then(function(json){
-									const parent_path = node.id.split('.').slice(0,-2).join('.')+'.' ;
+									const parent_path = node.id.split(SEP).slice(0,-2).join(SEP)+SEP ;
 									res_tree.jstree('close_node', parent_path);
 
 									if( json.errors == undefined ) alert(json.message);
@@ -352,7 +353,7 @@ onload = function(){
 /// Tree activities
 function t_open(path){
 	return new Promise( (ac,rj)=>{
-		var path_real = path.replace(new RegExp('\\.','g'),'/') ;
+		var path_real = path.replace(new RegExp('\\'+SEP,'g'),'/') ;
 
 		if( picogw == undefined )
 			return ;
@@ -367,7 +368,7 @@ function t_open(path){
 			let id_to_longdoc = {} ;
 			for( let dk in json ){
 				if( dk.charAt(0)=='_' ) continue;
-				let next_path_id = path+dk+'.' ;
+				let next_path_id = path+dk+SEP ;
 				let txt = dk;//`${path_real}${dk}` ;
 
 				node_properties[next_path_id] = {isleaf:true, settings_schema:undefined, settings:undefined } ;
