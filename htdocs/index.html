@@ -7,6 +7,7 @@
   .app-button { height:140px;width:100px;margin:5px;padding:0px;}
   .app-icon { margin-top:0px;padding:0px; }
   .app-text { height:40px;}
+  .ui-dialog-titlebar-close {visibility:hidden;}
 </style>
 </head>
 <body>
@@ -50,7 +51,9 @@ The external libraries used and their licenses are listed in <a href='https://gi
 <div id="api-test-dialog" title="API Test">
   <p id='api-testing-message'></p>
 </div>
-
+<div id="copy-able-alert-dialog" style="display:none;">
+  <p id='copy-able-alert-dialog-message'></p>
+</div>
 </body>
 
 <!-- Settings dialog -->
@@ -490,7 +493,22 @@ function genAppsList(){
 //		apps.forEach(app_info=>{
 //		});
 	});
-}
+  }
+
+  window.alert=msg=>{
+    $('#copy-able-alert-dialog-message').html(msg);
+//    $(".ui-dialog-titlebar-close").css("display","none");
+    $("#copy-able-alert-dialog").dialog({
+       modal:true,width:'50%',
+       title:'Message',
+       buttons: {
+         "OK": function() {
+            $(this).dialog("close");
+            $('#copy-able-alert-dialog-message').html('');
+         }
+       }
+    });
+  };
 
 </script>
 </html>
