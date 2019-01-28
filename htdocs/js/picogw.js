@@ -38,6 +38,8 @@ Unsubscribe:
 	}) ;
 */
 
+const CALLPROC_TIMEOUT = 30*1000; // in milliseconds
+
 
 function connectws(arg1, arg2, arg3) {
     let onconnect_func, ondisconnect_func, hostname;
@@ -67,11 +69,33 @@ function connectws(arg1, arg2, arg3) {
         let picogw = {
             callproc: (args)=>{
                 return new Promise((ac, rj)=>{
+                    start_spinner();
                     if (typeof args == 'string') {
                         args = {method: 'GET', path: args};
                     }
                     args.tid = tid;
-                    waitlist[tid] = [ac, rj];
+
+                    let timerId;
+
+                    function cleanUp(){
+                        if( timerId == undefined ) return false;
+                        timerId = undefined;
+                        stop_spinner();
+                        return true;
+                    }
+                    timerId = setTimeout(()=>{
+                        if(!cleanUp()) return;
+                        rj.apply({},[].slice.call(arguments));
+                    },CALLPROC_TIMEOUT);
+
+                    waitlist[tid] = [ //ac,rj];
+                        function(){
+                            if(!cleanUp()) return;
+                            ac.apply({},[].slice.call(arguments));
+                        }, function(){
+                            if(!cleanUp()) return;
+                            rj.apply({},[].slice.call(arguments));
+                        }];
                     tid++;
                     connection.send(JSON.stringify(args));
                 });
