@@ -188,7 +188,7 @@ onload = function(){
 												,args:{encrypted:cryptico.encrypt( JSON.stringify(editor.getValue()), getPubKey() ).cipher}
 											}).then(function(json){
 												console.log(json) ;
-												if( json.error == undefined ) alert('New settings saved.'); else alert(json.error);
+												if( json.success ) alert('New settings saved.'); else alert("Error in saving settings:"+JSON.stringify(json));
 											}).catch(e=>{
 												alert('API call failed:'+path) ; 
 												console.error(e) ;
