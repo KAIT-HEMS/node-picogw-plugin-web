@@ -220,8 +220,8 @@ onload = function(){
 							ht += `${acss.method} ${acss.path}${acss.args==undefined?'':' '+JSON.stringify(acss.args)} :` ;
 							$('#api-testing-message').html(ht+'</pre>') ;
 							let starttime = (new Date()).getTime() ;
-							$.ajax({type:acss.method,url:acss.path,dataType:'json,
-								,data:(typeof(acss.args)=='string'?acss.args:JSON.stringify(acss.args)),
+							$.ajax({type:acss.method,url:acss.path,dataType:'json'
+								,data:(typeof(acss.args)=='string'?acss.args:JSON.stringify(acss.args))
 								,contentType: 'application/json'
 								,success:json=>{
 									ht += ' success ('+( (new Date()).getTime() - starttime )+'ms) :' ;
