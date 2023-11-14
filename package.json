@@ -1,6 +1,6 @@
 {
   "name": "picogw-plugin-web",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Web plugin of picogw",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,7 @@
     ]
   },
   "devDependencies": {
-    "eslint": "^4.13.1",
+    "eslint": "^8.53.0",
     "eslint-config-google": "^0.9.1"
   }
 }
